@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: opencart-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: opencart-app
+  template:
+    metadata:
+      labels:
+        app: opencart-app
+    spec:
+      containers:
+        - name: opencart
+          image: your-dockerhub/opencart:latest  # replace with your image
+          ports:
+            - containerPort: 80
+          env:
+            - name: DB_HOST
+              value: opencart-db
+            - name: DB_NAME
+              value: opencart
+            - name: DB_USER
+              value: opencartuser
+            - name: DB_PASSWORD
+              value: opencartpass
+

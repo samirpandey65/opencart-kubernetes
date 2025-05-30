@@ -21,14 +21,10 @@ RUN apt-get update && apt-get install -y \
 # Create necessary directories
 RUN mkdir -p ${DIR_STORAGE} ${DIR_OPENCART}
 
-# Copy OpenCart upload folder (from local project)
+# Copy OpenCart upload folder
 COPY upload/ ${DIR_OPENCART}
 
-# Remove install folder if present
-#RUN rm -rf ${DIR_OPENCART}install
-
 # Move storage files
-#RUN cp -r ${DIR_OPENCART}/system/storage/* ${DIR_STORAGE}
 RUN cp -r ${DIR_OPENCART}/system/storage/* ${DIR_STORAGE}
 
 # Set permissions
@@ -41,17 +37,14 @@ RUN chown -R www-data:www-data ${DIR_STORAGE} ${DIR_IMAGE} \
   && chmod -R 755 ${DIR_CACHE} \
   && chmod -R 666 ${DIR_DOWNLOAD} ${DIR_SESSION} ${DIR_UPLOAD}
 
-# Copy custom php.ini if needed
-# COPY php.ini /usr/local/etc/php/
-
 # Copy nginx and supervisord config
 COPY default.conf /etc/nginx/sites-available/default
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
+# Healthcheck
+HEALTHCHECK CMD curl --fail http://localhost || exit 1
 
-# Expose HTTP port
 EXPOSE 80
 
-# Start nginx + php-fpm together via supervisord
 CMD ["/usr/bin/supervisord", "-n"]
 
